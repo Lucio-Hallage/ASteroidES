@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         #Carregando a imagen de fundo
-        player_img=pygame.image.load(path.join(img_dir,"playership_orange.png")).convert()
+        player_img=pygame.image.load(path.join(img_dir,"playerShip1_orange.png")).convert()
         self.image=player_img
         
         #diminuindo o tamanhoda imagem 
@@ -45,6 +45,19 @@ class Player(pygame.sprite.Sprite):
         #centraliza embaixo da tela 
         self.rect.centerx=WIDTH/2
         self.rect.bottom=HEIGHT-10
+        
+        #Velocidade da nave
+        self.speedx=0
+    
+    #Metodo q atualiza a posiÇaõ da navinha 
+    def update(self):
+        self.rect.x+=self.speedx
+        
+        #Mantem dentro da tela
+        if self.rect.right >WIDTH:
+            self.rect.right=WIDTH
+        if self.rect.left <0:
+            self.rect.left=0
         
 # Inicialização do Pygame.
 pygame.init()
@@ -63,6 +76,13 @@ clock = pygame.time.Clock()
 background = pygame.image.load(path.join(img_dir, 'starfield.png')).convert()
 background_rect = background.get_rect()
 
+#cria uma nave
+player=Player()
+
+#cria um grupo de sprites e add a nave
+all_sprites=pygame.sprite.Group()
+all_sprites.add(player)
+
 # Comando para evitar travamentos.
 try:
     
@@ -75,11 +95,30 @@ try:
         
         # Processa os eventos (mouse, teclado, botão, etc).
         for event in pygame.event.get():
-            
+
             # Verifica se foi fechado
             if event.type == pygame.QUIT:
                 running = False
-    
+                
+            # Verifica se apertou alguma tecla
+            if event.type == pygame.KEYDOWN:
+                #dependendo da tecla,altera a velocidade
+                if event.key == pygame.K_LEFT:
+                    player.speedx=-8
+                if event.key == pygame.K_RIGHT:
+                    player.speedx=8
+                    
+            # Verifica se apertou alguma tecla
+            if event.type == pygame.KEYUP:
+                #dependendo da tecla,altera a velocidade
+                if event.key == pygame.K_LEFT:
+                    player.speedx=0
+                if event.key == pygame.K_RIGHT:
+                    player.speedx=0
+        #Depois de processsar os eventos
+        #Atualiza a acao de cada sprite
+        all_sprites.update()
+                    
         # A cada loop, redesenha o fundo e os sprites
         screen.fill(BLACK)
         screen.blit(background, background_rect)
